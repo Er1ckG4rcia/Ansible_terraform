@@ -1,0 +1,32 @@
+---
+- name: Deploy VM using Terraform on vCenter
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Debug output for variables
+      debug:
+        msg:
+          - "vSphere Server: {{ VSPHERE_SERVER }}"
+          - "vSphere User: {{ VSPHERE_USER }}"
+
+    - name: Initialize Terraform
+      community.general.terraform:
+        project_path: "/runner/project/Ansible02/Criação de VM"
+        state: present
+        force_init: true
+    
+    - name: Apply Terraform configuration
+      community.general.terraform:
+        project_path: "/runner/project/Ansible02/Criação de VM"
+        state: present
+        variables:
+          vsphere_server: "{{ VSPHERE_SERVER }}"
+          vsphere_user: "{{ VSPHERE_USER }}"
+          vsphere_password: "{{ VSPHERE_PASSWORD }}"
+          vm_name: "{{ vm_name }}"
+          vcpu: "{{ vcpu }}"
+          ram: "{{ ram }}"
+          storage: "{{ storage }}"
+        force_init: false
+        plan_run: true

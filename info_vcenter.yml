@@ -1,0 +1,32 @@
+---
+- name: Coletar informações de Datastores do vCenter
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Obter informações de todos os datastores
+      vmware_datastore_info:
+        hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
+        username: "{{ lookup('env', 'VMWARE_USER') }}"
+        password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+        validate_certs: no
+      delegate_to: localhost
+      register: datastore_info
+
+    - name: Obter informações de todas as redes
+      vmware_network_info:
+        hostname: "{{ lookup('env', 'VMWARE_HOST') }}"
+        username: "{{ lookup('env', 'VMWARE_USER') }}"
+        password: "{{ lookup('env', 'VMWARE_PASSWORD') }}"
+        validate_certs: no
+      delegate_to: localhost
+      register: network_info
+
+    - name: Exibir informações de cada Datastore
+      debug:
+        msg: "Datastore Nome: {{ item.name }} - ID: {{ item.id }} - Tipo: {{ item.type }}"
+      with_items: "{{ datastore_info.datastores }}"
+
+    - name: Exibir informações de cada rede
+      debug:
+        msg: "Network Nome: {{ item.name }} - ID: {{ item.moid }}"
+      with_items: "{{ network_info.networks }}"
